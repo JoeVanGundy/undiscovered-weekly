@@ -1,1 +1,1 @@
-# undiscovered-weekly
+# Run npm install && npm start
