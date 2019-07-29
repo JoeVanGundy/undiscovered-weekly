@@ -14,10 +14,10 @@ export const authEndpoint = 'https://accounts.spotify.com/authorize';
 const clientId = "670b1531e1d74e8c97c3c81aaa6fc9b0";
 const redirectUri = "http://localhost:3000";
 const scopes = [
-  "user-read-private", 
+  "user-read-private",
   "user-read-email",
-  "user-read-playback-state", 
-  "user-top-read", 
+  "user-read-playback-state",
+  "user-top-read",
   "playlist-modify-public"
 ];
 
@@ -188,7 +188,7 @@ class App extends Component {
     this.setState({ maxPopularity: event.target.value });
   }
 
-  onGenreCheck(event){
+  onGenreCheck(event) {
     if (this.state.selectedGenres.length > 4) {
       event.target.checked = false
     }
@@ -251,7 +251,7 @@ class App extends Component {
   // Returns track recommendations from genres
   getRecommendationsFromGenres() {
     var promises = []
-    for (var i=0; i<5; i++) {
+    for (var i = 0; i < 5; i++) {
       promises.push(spotifyApi.getRecommendations({ seed_genres: this.getSelectedGenres(), max_popularity: 100, limit: 100 }));
     }
     return Promise.all(promises)
@@ -309,25 +309,25 @@ class App extends Component {
             genre = genre.replace(" ", "-")
             var res = genre.split("-");
             res.forEach(function (subGenre) {
-             if (availableGenres.includes(subGenre)) {
-               if (!(subGenre in dict)) {
-                dict[subGenre] = 1
-               } else {
-                 dict[subGenre]++
-               }
-             }
+              if (availableGenres.includes(subGenre)) {
+                if (!(subGenre in dict)) {
+                  dict[subGenre] = 1
+                } else {
+                  dict[subGenre]++
+                }
+              }
             })
           })
         });
         var result = Object.keys(dict).sort(function (a, b) {
           return dict[b] - dict[a];
         })
-        this.setState({ usersFavoriteGenres: result.slice(0, 5).join(",")})
+        this.setState({ usersFavoriteGenres: result.slice(0, 5).join(",") })
         return result.slice(0, 5).join(",")
       })
   }
 
-  getArtists(artists){
+  getArtists(artists) {
     var promises = []
     var i, j, temparray, chunk = 50;
     for (i = 0, j = artists.length; i < j; i += chunk) {
@@ -338,8 +338,8 @@ class App extends Component {
   }
 
   updateRecommendations() {
-  
-      this.getUsersTopGenres()
+
+    this.getUsersTopGenres()
       .then((response) => {
         return this.getRecommendationsFromGenres()
       })
@@ -357,7 +357,7 @@ class App extends Component {
       })
   }
 
-  flatten(object, type){
+  flatten(object, type) {
     var flat = [];
     for (var i = 0; i < object.length; i++) {
       if (type === 'tracks') {
@@ -371,8 +371,8 @@ class App extends Component {
 
   getUsersPlaylist() {
     spotifyApi.getUserPlaylists()
-    .then((response) => {
-    })
+      .then((response) => {
+      })
   }
 
   componentDidMount() {
@@ -391,28 +391,68 @@ class App extends Component {
 
   render() {
     return (
-      <div className="App">
+      <div class="container" className="App">
         {!this.state.token &&
-          <a className="btn btn--login App-link" href={`${authEndpoint}?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes.join("%20")}&response_type=token&show_dialog=true`}>
-            Login to Spotify
-          </a>
+          <div class="text-white bg-dark mb-3">
+            <a className="btn btn--login App-link" href={`${authEndpoint}?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes.join("%20")}&response_type=token&show_dialog=true`}>
+              Login to Spotify
+              </a>
+          </div>
         }
         {this.state.token &&
           <div>
+            <div class="card text-white bg-dark mb-3">
+              <div class="card-body">
+                <h3>Your favorite genres are: {this.state.usersFavoriteGenres}</h3>
+              </div>
+            </div>
+
             <Genres genres={this.state.availableGenres} handleGenreCheck={this.onGenreCheck} />
-            <h3>Your favorite genres are: {this.state.usersFavoriteGenres}</h3>
-            <Playlists spotifyApi={spotifyApi} onPlaylistSelect={this.onPlaylistSelect}/>
-            <form>
-              <label for="customRange1"><h3>Max Artist Popularity: {this.state.maxPopularity}</h3></label>
-              <input style={{ marginLeft: '50px', width: '400px' }} type="range" class="custom-range" id="customRange1" onChange={this.handleChange}></input>
-            </form>
-            <br></br>
-            <button style={{marginRight: "200px"}}type="button" className="btn btn-primary" onClick={() => this.updateRecommendations()}>
-              Get New Recommendations
-            </button>
-            <button type="button" className="btn btn-primary" onClick={() => this.replacePlaylist(this.state.chosenPlaylist, this.state.recommendations)}>
-              Add to Playlist
-            </button>
+
+            <div class="card text-white bg-dark mb-3">
+              <div class="card-body">
+                <form>
+                  <label for="customRange1"><h3>Max Artist Popularity: {this.state.maxPopularity}</h3></label>
+                  <input style={{ width: '400px' }} type="range" class="custom-range" id="customRange1" onChange={this.handleChange}></input>
+                </form>
+              </div>
+            </div>
+
+            <div class="row">
+
+              <div class="col-sm-6">
+                <div class="card text-white bg-dark mb-3">
+                  <div class="card-body">
+                    <button type="button" className="btn btn-primary" onClick={() => this.updateRecommendations()}>
+                      Get New Recommendations
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-sm-6">
+                <div class="card text-white bg-dark mb-3 row">
+                  <div class="card-body row">
+
+                    <div class="col-xs-1">
+                      <Playlists spotifyApi={spotifyApi} onPlaylistSelect={this.onPlaylistSelect} />
+                    </div>
+
+
+                    <div class="col-xs-1">
+                      <button type="button" className="btn btn-primary" onClick={() => this.replacePlaylist(this.state.chosenPlaylist, this.state.recommendations)}>
+                        Add to Playlist
+                      </button>
+                    </div>
+
+
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+
             <Recommendations recommendations={this.state.recommendations} />
           </div>
         }

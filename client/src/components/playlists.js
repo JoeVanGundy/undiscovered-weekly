@@ -33,18 +33,13 @@ class Playlists extends React.Component {
             )
         }
         return (
-            <div>
-                <div class="container" style={{width:"40%"}}>
-                    {
-                        <div>
-                            <h2>Add songs to which playlist:</h2>
-                            <select onChange={this.changeSelect} class="form-control form-control-lg">
-                                <option disabled selected value>Choose Playlist</option>
-                                {playlists}
-                            </select>
-                        </div>
-                    }
-                </div>
+            <div >
+                {
+                    <select class="form-control" onChange={this.changeSelect}>
+                    <option disabled selected value>Choose Playlist</option>
+                    {playlists}
+                </select>
+                }
             </div>
         );
     }

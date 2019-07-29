@@ -12,8 +12,8 @@ class Genres extends React.Component {
 
     render() {
         return (
-        <div>
-            <div>
+            <div class="card text-white bg-dark mb-3">
+            <div class="card-body">
                 {this.props.genres.map((genre) => (
                     <div class="custom-control custom-checkbox custom-control-inline">
                         <input type="checkbox" class="custom-control-input" id={genre} onClick={this.handleCheck}></input>
