@@ -176,7 +176,8 @@ class App extends Component {
         "turkish",
         "work-out",
         "world-music"],
-      selectedGenres: []
+      selectedGenres: [],
+      usersFavoriteGenres: []
     }
     this.handleChange = this.handleChange.bind(this);
     this.onGenreCheck = this.onGenreCheck.bind(this);
@@ -239,7 +240,11 @@ class App extends Component {
   }
 
   getSelectedGenres() {
-    return this.state.selectedGenres.join(',')
+    if (this.state.selectedGenres.length != 0) {
+      return this.state.selectedGenres.join(',')
+    } else {
+      return this.state.usersFavoriteGenres
+    }
   }
 
 
@@ -295,13 +300,30 @@ class App extends Component {
   }
 
   getUsersTopGenres() {
-    return spotifyApi.getMyTopArtists({ limit: 1 })
+    var availableGenres = this.state.availableGenres
+    return spotifyApi.getMyTopArtists({ limit: 50 })
       .then((response) => {
-        var topArtists = JSON.parse(JSON.stringify(response)).items[0].genres
-        if (topArtists.length >= 5) {
-          topArtists.length = 5
-        }
-        return topArtists
+        var dict = {}
+        response.items.forEach(function (artist) {
+          artist.genres.forEach(function (genre) {
+            genre = genre.replace(" ", "-")
+            var res = genre.split("-");
+            res.forEach(function (subGenre) {
+             if (availableGenres.includes(subGenre)) {
+               if (!(subGenre in dict)) {
+                dict[subGenre] = 1
+               } else {
+                 dict[subGenre]++
+               }
+             }
+            })
+          })
+        });
+        var result = Object.keys(dict).sort(function (a, b) {
+          return dict[b] - dict[a];
+        })
+        this.setState({ usersFavoriteGenres: result.slice(0, 5).join(",")})
+        return result.slice(0, 5).join(",")
       })
   }
 
@@ -316,7 +338,11 @@ class App extends Component {
   }
 
   updateRecommendations() {
-    this.getRecommendationsFromGenres()
+  
+      this.getUsersTopGenres()
+      .then((response) => {
+        return this.getRecommendationsFromGenres()
+      })
       .then((response) => {
         var uniqueArtists = this.getArtistsFromRecommendations(JSON.parse(JSON.stringify(this.flatten(response, 'tracks'))))
         return this.getArtists(uniqueArtists)
@@ -350,7 +376,6 @@ class App extends Component {
   }
 
   componentDidMount() {
-  
     // Set token
     console.log(hash)
     let _token = hash.access_token;
@@ -361,6 +386,7 @@ class App extends Component {
         token: _token
       });
     }
+    this.updateRecommendations()
   }
 
   render() {
@@ -374,6 +400,7 @@ class App extends Component {
         {this.state.token &&
           <div>
             <Genres genres={this.state.availableGenres} handleGenreCheck={this.onGenreCheck} />
+            <h3>Your favorite genres are: {this.state.usersFavoriteGenres}</h3>
             <Playlists spotifyApi={spotifyApi} onPlaylistSelect={this.onPlaylistSelect}/>
             <form>
               <label for="customRange1"><h3>Max Artist Popularity: {this.state.maxPopularity}</h3></label>
@@ -385,9 +412,6 @@ class App extends Component {
             </button>
             <button type="button" className="btn btn-primary" onClick={() => this.replacePlaylist(this.state.chosenPlaylist, this.state.recommendations)}>
               Add to Playlist
-            </button>
-            <button type="button" className="btn btn-primary" onClick={() => this.getUsersPlaylist()}>
-            Create Playlist
             </button>
             <Recommendations recommendations={this.state.recommendations} />
           </div>
