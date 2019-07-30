@@ -35,10 +35,10 @@ class Playlists extends React.Component {
         return (
             <div >
                 {
-                    <select class="form-control" onChange={this.changeSelect}>
-                    <option disabled selected value>Choose Playlist</option>
-                    {playlists}
-                </select>
+                    <select style={{ width: "50%" }} class="custom-select" onChange={this.changeSelect}>
+                        <option disabled selected value>Choose Playlist</option>
+                        {playlists}
+                    </select>
                 }
             </div>
         );
