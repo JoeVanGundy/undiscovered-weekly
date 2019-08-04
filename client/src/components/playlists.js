@@ -33,13 +33,21 @@ class Playlists extends React.Component {
             )
         }
         return (
-            <div >
-                {
-                    <select style={{ width: "50%" }} class="custom-select" onChange={this.changeSelect}>
-                        <option disabled selected value>Choose Playlist</option>
-                        {playlists}
-                    </select>
-                }
+            <div class="card text-white bg-dark mb-3">
+                <div class="card-header">
+                    <h4>Where you like to save your playlist?</h4>
+                </div>
+                <div class="card-body">
+                    <div class="input-group" style={{width: "50%", marginRight: "auto", marginLeft: "auto"}}>
+                        <select class="custom-select" onChange={this.changeSelect}>
+                            <option disabled selected value>Choose Playlist</option>
+                            {playlists}
+                        </select>
+                        <div class="input-group-append">
+                            <button class="btn btn-secondary" type="button">Save Playlist</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

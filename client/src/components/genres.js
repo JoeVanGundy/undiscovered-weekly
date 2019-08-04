@@ -14,6 +14,10 @@ class Genres extends React.Component {
         this.props.handleGenreCheck(event)
     }
 
+    isActive(name){
+        return this.props.selectedGenres.includes(name) ? 'btn btn-secondary active' : 'btn btn-secondary'
+    }
+
     toggleUseFavorite(event){
         this.setState({chooseFavorite: event.target.checked})
     }
@@ -31,12 +35,20 @@ class Genres extends React.Component {
                 
                 {this.state.chooseFavorite &&
                 <div class="card-body">
-                    {this.props.genres.map((genre) => (
-                        <div class="custom-control custom-checkbox custom-control-inline">
-                            <input type="checkbox" class="custom-control-input" id={genre} onClick={this.handleCheck}></input>
-                            <label class="custom-control-label" for={genre}>{genre}</label>
-                        </div>
-                    ))}
+                    <div class="btn-group-toggle" data-toggle="buttons">
+                        {this.props.genres.map((genre) => (
+                            // <div class="custom-control custom-checkbox custom-control-inline">
+                            //     <input type="checkbox" class="custom-control-input" id={genre} onClick={this.handleCheck}></input>
+                            //     <label class="custom-control-label" for={genre}>{genre}</label>
+                            // </div>
+                            // <div class="custom-control custom-button custom-control-inline" style={{marginTop:"5px", marginBottom:"5px"}} onClick={this.handleCheck}>
+                            //     <button className={this.isActive(genre)}>{genre}</button>
+                            // </div>
+                            <label style={{margin:"5px"}} className={this.isActive(genre)}>
+                                <input type="checkbox" class="custom-control-input" autocomplete="off" id={genre} onClick={this.handleCheck}/>{genre}
+                            </label>
+                        ))}
+                    </div>
                 </div>
                 }
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import Playlists from './playlists';
 
 class Recommendations extends React.Component {
     constructor(props) {
@@ -8,7 +7,6 @@ class Recommendations extends React.Component {
             recommendations: [],
             topTracks: [],
             topArtists: [],
-            maxPopularity: 50,
             chosenPlaylist: "",
             availableGenres: [
                 "acoustic",
@@ -139,24 +137,21 @@ class Recommendations extends React.Component {
                 "world-music"],
         }
         this.updateRecommendations = this.updateRecommendations.bind(this);
-        this.replacePlaylist = this.replacePlaylist.bind(this);
-        this.onPlaylistSelect = this.onPlaylistSelect.bind(this);
+        // this.replacePlaylist = this.replacePlaylist.bind(this);
+        // this.onPlaylistSelect = this.onPlaylistSelect.bind(this);
+        // this.handleChange = this.handleChange.bind(this);
     }
 
-
-    // Replace all the existing tracks in the playlist with the new recommendations
-    replacePlaylist(playlist, recommendations) {
-        this.props.spotifyApi.replaceTracksInPlaylist(playlist, this.getTrackUris(recommendations))
-            .then((response) => {
-            });
-    }
+    // handleChange(event) {
+    //     this.setState({ maxPopularity: event.target.value });
+    // }
 
 
     getSelectedGenres() {
         if (this.props.selectedGenres.length != 0) {
             return this.props.selectedGenres.join(',')
         } else {
-            return this.props.usersFavoriteGenres
+            return this.props.usersFavoriteGenress
         }
     }
 
@@ -245,13 +240,6 @@ class Recommendations extends React.Component {
     }
 
 
-    onPlaylistSelect(event) {
-        this.setState({ chosenPlaylist: event.target.options[event.target.selectedIndex].id });
-    }
-
-
-
-
     flatten(object, type) {
         var flat = [];
         for (var i = 0; i < object.length; i++) {
@@ -280,7 +268,7 @@ class Recommendations extends React.Component {
                 return this.getArtists(uniqueArtists)
             })
             .then((response) => {
-                var unpopularArtists = this.getUnpopularArtists(JSON.parse(JSON.stringify(this.flatten(response, 'artists'))), this.state.maxPopularity)
+                var unpopularArtists = this.getUnpopularArtists(JSON.parse(JSON.stringify(this.flatten(response, 'artists'))), this.props.maxPopularity)
                 return this.getArtistsTopTracks(unpopularArtists)
             })
             .then((response) => {
@@ -297,13 +285,20 @@ class Recommendations extends React.Component {
         return (
             <div class="card text-white bg-dark mb-3">
                 <div class="card-body">
+                    <button type="button" className="btn btn-primary btn-dark" onClick={() => this.updateRecommendations()}>
+                        Get New Recommendations
+                    </button>
+                    {/* <form>
+                        <label for="customRange1"><h3>Max Artist Popularity: {this.state.maxPopularity}</h3></label>
+                        <input style={{ width: '400px' }} type="range" class="custom-range" id="customRange1" onChange={this.handleChange}></input>
+                    </form> */}
                     <table class="table table-dark table-hover">
                         <thead>
                             <tr>
                                 <th>#</th>
                                 <th>Artist</th>
                                 <th>Title</th>
-                                <td>Album</td>
+                                <th>Album</th>
                                 <th>Top Track Popularity</th>
                             </tr>
                         </thead>

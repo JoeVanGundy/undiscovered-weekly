@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Recommendations from './components/recommendations'
 import Popularity from './components/popularity'
 import Genres from './components/genres';
+import Playlists from './components/playlists';
 import './App.css';
 
 import SpotifyWebApi from 'spotify-web-api-js';
@@ -46,6 +47,7 @@ class App extends Component {
 			loggedIn: token ? true : false,
 			selectedGenres: [],
 			usersFavoriteGenres: [],
+			maxPopularity: 50,
 			availableGenres: [
 				"acoustic",
 				"afrobeat",
@@ -176,29 +178,64 @@ class App extends Component {
     }
     // this.handleChange = this.handleChange.bind(this);
     this.onGenreCheck = this.onGenreCheck.bind(this);
-		// this.onPlaylistSelect = this.onPlaylistSelect.bind(this);
+		this.onPlaylistSelect = this.onPlaylistSelect.bind(this);
 		// this.updateRecommendations = this.updateRecommendations.bind(this);
-		// this.replacePlaylist = this.replacePlaylist.bind(this);
+		this.replacePlaylist = this.replacePlaylist.bind(this);
+		this.handlePopularityChange = this.handlePopularityChange.bind(this);
   }
 
   // handleChange(event) {
   //   this.setState({ maxPopularity: event.target.value });
-  // }
+	// }
+	
+	handlePopularityChange(value) {
+		this.setState({maxPopularity: value})
+	}
+
+	onPlaylistSelect(event) {
+		this.setState({ chosenPlaylist: event.target.options[event.target.selectedIndex].id });
+	}
+
+	// Replace all the existing tracks in the playlist with the new recommendations
+	replacePlaylist(playlist, recommendations) {
+		this.props.spotifyApi.replaceTracksInPlaylist(playlist, this.getTrackUris(recommendations))
+			.then((response) => {
+			});
+	}
 
   onGenreCheck(event) {
-    if (this.state.selectedGenres.length > 4) {
-      event.target.checked = false
-    }
-    if (event.target.checked) {
-      this.setState({
-        selectedGenres: [...this.state.selectedGenres, event.target.id]
-      })
-    } else {
-      this.setState({
-        selectedGenres: this.state.selectedGenres.filter((_, i) => i !== this.state.selectedGenres.indexOf(event.target.id))
-      });
-    }
-  }
+		if (this.state.selectedGenres.includes(event.target.id)) {
+			console.log("Remove: " + event.target.id)
+			this.setState({
+				selectedGenres: this.state.selectedGenres.filter((_, i) => i !== this.state.selectedGenres.indexOf(event.target.id))
+			})
+		} 
+		else if (this.state.selectedGenres.length > 4) {
+			console.log("Can't add: " + event.target.id)
+			return
+		} else {
+			console.log("Add: " + event.target.id)
+			this.setState({
+				selectedGenres: [...this.state.selectedGenres, event.target.id]
+			});
+		}
+		console.log(this.state.selectedGenres)
+	}
+	
+	// onGenreCheck(event) {
+	// 	if (this.state.selectedGenres.length > 4) {
+	// 		event.target.checked = false
+	// 	}
+	// 	if (event.target.checked) {
+	// 		this.setState({
+	// 			selectedGenres: [...this.state.selectedGenres, event.target.id]
+	// 		})
+	// 	} else {
+	// 		this.setState({
+	// 			selectedGenres: this.state.selectedGenres.filter((_, i) => i !== this.state.selectedGenres.indexOf(event.target.id))
+	// 		});
+	// 	}
+	// }
 
 
   getHashParams() {
@@ -221,57 +258,63 @@ class App extends Component {
       })
 	}
 	
-	getUsersTopGenres() {
+	async getUsersTopGenres() {
 		var availableGenres = this.state.availableGenres
-		return spotifyApi.getMyTopArtists({ limit: 50 })
-			.then((response) => {
-				var dict = {}
-				response.items.forEach(function (artist) {
-					artist.genres.forEach(function (genre) {
-						genre = genre.replace(" ", "-")
-						var res = genre.split("-");
-						res.forEach(function (subGenre) {
-							if (availableGenres.includes(subGenre)) {
-								if (!(subGenre in dict)) {
-									dict[subGenre] = 1
-								} else {
-									dict[subGenre]++
-								}
-							}
-						})
-					})
+		const response = await spotifyApi.getMyTopArtists({ limit: 50 });
+		var dict = {};
+		response.items.forEach(function (artist) {
+			artist.genres.forEach(function (genre) {
+				genre = genre.replace(" ", "-");
+				var res = genre.split("-");
+				res.forEach(function (subGenre) {
+					if (availableGenres.includes(subGenre)) {
+						if (!(subGenre in dict)) {
+							dict[subGenre] = 1;
+						}
+						else {
+							dict[subGenre]++;
+						}
+					}
 				});
-
-				var result = Object.keys(dict).sort(function (a, b) {
-					return dict[b] - dict[a];
-				})
-				this.setState({ usersFavoriteGenres: result.slice(0, 5).join(",") })
-				return result.slice(0, 5).join(",")
-			})
+			});
+		});
+		var result = Object.keys(dict).sort(function (a, b) {
+			return dict[b] - dict[a];
+		});
+		// this.setState({ usersFavoriteGenres: result.slice(0, 5).join(",") })
+		return result.slice(0, 5).join(",");
 	}
 
 
-
-  componentDidMount() {
-    // Set token
-    let _token = hash.access_token;
-    if (_token) {
-      spotifyApi.setAccessToken(_token);
-      // Set token
-      this.setState({
-        token: _token
-      });
+	componentWillMount() {
+		// Set token
+		let _token = hash.access_token;
+		if (_token) {
+			spotifyApi.setAccessToken(_token);
+			// Set token
+			this.setState({
+				token: _token
+			});
+			this.getUsersTopGenres()
+				.then((response) => {
+					this.setState({ usersFavoriteGenres: response })
+				})
 		}
-		this.getUsersTopGenres()
-		.then((response) => {
-			console.log(response)
-		})
-  }
+
+	}
 
   render() {
+		// Render recommendation once top genres are ready
+		let recommendations;
+		if (this.state.usersFavoriteGenres.length > 0) {
+			recommendations = <Recommendations spotifyApi={spotifyApi} maxPopularity={this.state.maxPopularity} selectedGenres={this.state.selectedGenres} usersFavoriteGenress={this.state.usersFavoriteGenres} />
+		} else {
+			recommendations = null
+		}
+
     return (
       <div class="container" className="App">
-        {!this.state.token &&
+				{!this.state.token &&
           <div class="text-white bg-dark mb-3">
             <a className="btn btn--login App-link" href={`${authEndpoint}?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes.join("%20")}&response_type=token&show_dialog=true`}>
               Login to Spotify
@@ -280,11 +323,24 @@ class App extends Component {
         }
         {this.state.token &&
           <div>
-						<Genres genres={this.state.availableGenres} handleGenreCheck={this.onGenreCheck} favoriteGenres={this.state.usersFavoriteGenres} />
-						<Popularity />
-						{/* <Recommendations spotifyApi={spotifyApi} selectedGenres={this.state.selectedGenres} usersFavoriteGenres={this.state.usersFavoriteGenres}/> */}
+					<div class="jumbotron">
+							<h1>Undiscovered Weekly</h1>
+					</div>
+						<Genres genres={this.state.availableGenres} handleGenreCheck={this.onGenreCheck} favoriteGenres={this.state.usersFavoriteGenres} selectedGenres={this.state.selectedGenres} />
+						<Popularity handlePopularityChange={this.handlePopularityChange}/>
+						{/* <button type="button" className="btn btn-primary btn-dark" onClick={() => this.replacePlaylist(this.state.chosenPlaylist, this.state.recommendations)}>
+						Add to Playlist
+						</button> */}
+
+						{recommendations}
+						<Playlists spotifyApi={spotifyApi} onPlaylistSelect={this.onPlaylistSelect} />
           </div>
-        }
+				}
+				<footer id="sticky-footer" class="py-4 bg-dark text-white-50">
+					<div class="container text-center">
+						<small>Made by Joe Van Gundy</small>
+					</div>
+				</footer>
       </div>
     );
   }

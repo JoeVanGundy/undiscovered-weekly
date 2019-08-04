@@ -4,6 +4,16 @@
 
 body {
   background-color: #272b2e;
+  /* background: linear-gradient(to bottom right,black, grey);
+  background-attachment: fixed; */
+}
+
+.jumbotron {
+  background-color: #272b2e;
+}
+
+.jumbotron h1 {
+  color: whitesmoke
 }
 
 
@@ -21,3 +31,5 @@ body {
 .App-intro {
   font-size: large;
 }
+
+
