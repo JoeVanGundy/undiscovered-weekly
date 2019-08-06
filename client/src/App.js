@@ -12,7 +12,7 @@ export const authEndpoint = 'https://accounts.spotify.com/authorize';
 
 // Replace with your app's client ID, redirect URI and desired scopes
 const clientId = "670b1531e1d74e8c97c3c81aaa6fc9b0";
-const redirectUri = "http://localhost:3000";
+const redirectUri = "https://joevangundy.github.io/undiscovered-weekly/";
 const scopes = [
   "user-read-private",
   "user-read-email",
