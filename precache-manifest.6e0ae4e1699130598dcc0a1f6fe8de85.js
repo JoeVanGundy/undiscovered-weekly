@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "acf7ed24a9124859675ed201518c6f70",
+    "revision": "941b336d8ed6eabc1ae349a8a55b1bb2",
     "url": "/undiscovered-weekly/index.html"
   },
   {
-    "revision": "f41327afd04c750c9a88",
+    "revision": "5555d0beb33f63388f5f",
     "url": "/undiscovered-weekly/static/css/main.31549b79.chunk.css"
   },
   {
@@ -12,8 +12,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/undiscovered-weekly/static/js/2.95f8bab6.chunk.js"
   },
   {
-    "revision": "f41327afd04c750c9a88",
-    "url": "/undiscovered-weekly/static/js/main.ec05ce6f.chunk.js"
+    "revision": "5555d0beb33f63388f5f",
+    "url": "/undiscovered-weekly/static/js/main.42575553.chunk.js"
   },
   {
     "revision": "985611551d5589a05eeb",
