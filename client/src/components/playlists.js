@@ -8,6 +8,7 @@ class Playlists extends React.Component {
             playlists: {}
         }
         this.changeSelect = this.changeSelect.bind(this);
+        this.savePlaylist = this.savePlaylist.bind(this);
     }
 
     componentDidMount() {
@@ -15,10 +16,31 @@ class Playlists extends React.Component {
     }
 
     getUsersPlaylist() {
-        this.props.spotifyApi.getUserPlaylists()
+        this.props.spotifyApi.getUserPlaylists({limit: 50})
             .then((response) => {
                 this.setState({ playlists: response });
             })
+    }
+
+    createNewPlaylist() {
+        return this.props.spotifyApi.getMe()
+            .then((response) => {
+                return this.props.spotifyApi.createPlaylist(response.id, {name: "Undiscovered Weekly"})
+            })
+    }
+
+    savePlaylist(event) {
+        if(this.props.chosenPlaylist === "") {
+            this.createNewPlaylist()
+            .then((response) => {
+                this.props.selectCreatedPlaylist(response.id)
+            })
+            .then((response) => {
+                this.props.replacePlaylist()
+            })
+        }
+        this.props.replacePlaylist()
+
     }
 
     changeSelect(event){
@@ -40,11 +62,11 @@ class Playlists extends React.Component {
                 <div class="card-body">
                     <div class="input-group" style={{width: "50%", marginRight: "auto", marginLeft: "auto"}}>
                         <select class="custom-select" onChange={this.changeSelect}>
-                            <option disabled selected value>Choose Playlist</option>
+                            <option selected id="default" value>---Create New Playlist---</option>
                             {playlists}
                         </select>
                         <div class="input-group-append">
-                            <button class="btn btn-secondary" type="button">Save Playlist</button>
+                            <button class="btn btn-secondary" type="button" onClick={this.savePlaylist}>Save Playlist</button>
                         </div>
                     </div>
                 </div>

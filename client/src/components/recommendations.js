@@ -1,4 +1,5 @@
 import React from 'react';
+import Playlists from './playlists';
 
 class Recommendations extends React.Component {
     constructor(props) {
@@ -137,14 +138,35 @@ class Recommendations extends React.Component {
                 "world-music"],
         }
         this.updateRecommendations = this.updateRecommendations.bind(this);
-        // this.replacePlaylist = this.replacePlaylist.bind(this);
-        // this.onPlaylistSelect = this.onPlaylistSelect.bind(this);
+        this.onPlaylistSelect = this.onPlaylistSelect.bind(this);
+        this.replacePlaylist = this.replacePlaylist.bind(this);
+        this.getUsersPlaylist = this.getUsersPlaylist.bind(this);
+        this.selectCreatedPlaylist = this.selectCreatedPlaylist.bind(this);
         // this.handleChange = this.handleChange.bind(this);
     }
 
-    // handleChange(event) {
-    //     this.setState({ maxPopularity: event.target.value });
-    // }
+
+    getUsersPlaylist() {
+        this.props.spotifyApi.getUserPlaylists()
+            .then((response) => {
+        })
+    }
+
+
+    onPlaylistSelect(event) {
+        this.setState({ chosenPlaylist: event.target.options[event.target.selectedIndex].id });
+    }
+
+    selectCreatedPlaylist(playlist) {
+        this.setState({ chosenPlaylist: playlist });
+    }
+
+    // Replace all the existing tracks in the playlist with the new recommendations
+    replacePlaylist(recommendations) {
+        this.props.spotifyApi.replaceTracksInPlaylist(this.state.chosenPlaylist, this.getTrackUris(recommendations))
+            .then((response) => {
+            });
+    }
 
 
     getSelectedGenres() {
@@ -253,9 +275,9 @@ class Recommendations extends React.Component {
     }
 
     // Returns the uris of the tracks to be put in the playlist
-    getTrackUris(recommendations) {
+    getTrackUris() {
         var trackUris = []
-        recommendations.forEach(function (track) {
+        this.state.recommendations.forEach(function (track) {
             trackUris.push(track.uri)
         });
         return trackUris
@@ -283,39 +305,39 @@ class Recommendations extends React.Component {
 
     render() {
         return (
-            <div class="card text-white bg-dark mb-3">
-                <div class="card-body">
-                    <button type="button" className="btn btn-primary btn-dark" onClick={() => this.updateRecommendations()}>
-                        Get New Recommendations
-                    </button>
-                    {/* <form>
-                        <label for="customRange1"><h3>Max Artist Popularity: {this.state.maxPopularity}</h3></label>
-                        <input style={{ width: '400px' }} type="range" class="custom-range" id="customRange1" onChange={this.handleChange}></input>
-                    </form> */}
-                    <table class="table table-dark table-hover">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Artist</th>
-                                <th>Title</th>
-                                <th>Album</th>
-                                <th>Top Track Popularity</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {this.state.recommendations.map((recommendation, index) => (
+            <div>
+                <div class="card text-white bg-dark mb-3">
+                    <div class="card-body">
+                        <button type="button" className="btn btn-secondary" onClick={() => this.updateRecommendations()}>
+                            Get New Recommendations
+                        </button>
+                        <table class="table table-dark table-hover">
+                            <thead>
                                 <tr>
-                                    <td>{index+1}</td>
-                                    <td>{recommendation.artists[0].name}</td>
-                                    <td>{recommendation.name}</td>
-                                    <td>{recommendation.album.name}</td>
-                                    <td>{recommendation.popularity}</td>
+                                    <th>#</th>
+                                    <th>Artist</th>
+                                    <th>Title</th>
+                                    <th>Album</th>
+                                    <th>Top Track Popularity</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {this.state.recommendations.map((recommendation, index) => (
+                                    <tr>
+                                        <td>{index+1}</td>
+                                        <td>{recommendation.artists[0].name}</td>
+                                        <td>{recommendation.name}</td>
+                                        <td>{recommendation.album.name}</td>
+                                        <td>{recommendation.popularity}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+                <Playlists spotifyApi={this.props.spotifyApi} onPlaylistSelect={this.onPlaylistSelect} replacePlaylist={this.replacePlaylist} selectCreatedPlaylist={this.selectCreatedPlaylist} chosenPlaylist={this.state.chosenPlaylist} />
             </div>
+            
         );
     }
 }

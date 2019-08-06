@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Recommendations from './components/recommendations'
 import Popularity from './components/popularity'
 import Genres from './components/genres';
-import Playlists from './components/playlists';
 import './App.css';
 
 import SpotifyWebApi from 'spotify-web-api-js';
@@ -178,9 +177,7 @@ class App extends Component {
     }
     // this.handleChange = this.handleChange.bind(this);
     this.onGenreCheck = this.onGenreCheck.bind(this);
-		this.onPlaylistSelect = this.onPlaylistSelect.bind(this);
 		// this.updateRecommendations = this.updateRecommendations.bind(this);
-		this.replacePlaylist = this.replacePlaylist.bind(this);
 		this.handlePopularityChange = this.handlePopularityChange.bind(this);
   }
 
@@ -192,34 +189,19 @@ class App extends Component {
 		this.setState({maxPopularity: value})
 	}
 
-	onPlaylistSelect(event) {
-		this.setState({ chosenPlaylist: event.target.options[event.target.selectedIndex].id });
-	}
-
-	// Replace all the existing tracks in the playlist with the new recommendations
-	replacePlaylist(playlist, recommendations) {
-		this.props.spotifyApi.replaceTracksInPlaylist(playlist, this.getTrackUris(recommendations))
-			.then((response) => {
-			});
-	}
-
   onGenreCheck(event) {
 		if (this.state.selectedGenres.includes(event.target.id)) {
-			console.log("Remove: " + event.target.id)
 			this.setState({
 				selectedGenres: this.state.selectedGenres.filter((_, i) => i !== this.state.selectedGenres.indexOf(event.target.id))
 			})
 		} 
 		else if (this.state.selectedGenres.length > 4) {
-			console.log("Can't add: " + event.target.id)
 			return
 		} else {
-			console.log("Add: " + event.target.id)
 			this.setState({
 				selectedGenres: [...this.state.selectedGenres, event.target.id]
 			});
 		}
-		console.log(this.state.selectedGenres)
 	}
 	
 	// onGenreCheck(event) {
@@ -250,17 +232,10 @@ class App extends Component {
     return hashParams;
   }
 
-
-
-  getUsersPlaylist() {
-    spotifyApi.getUserPlaylists()
-      .then((response) => {
-      })
-	}
 	
 	async getUsersTopGenres() {
 		var availableGenres = this.state.availableGenres
-		const response = await spotifyApi.getMyTopArtists({ limit: 50 });
+		const response = await spotifyApi.getMyTopArtists({ limit: 50, time_range: "short_term" });
 		var dict = {};
 		response.items.forEach(function (artist) {
 			artist.genres.forEach(function (genre) {
@@ -281,7 +256,6 @@ class App extends Component {
 		var result = Object.keys(dict).sort(function (a, b) {
 			return dict[b] - dict[a];
 		});
-		// this.setState({ usersFavoriteGenres: result.slice(0, 5).join(",") })
 		return result.slice(0, 5).join(",");
 	}
 
@@ -333,7 +307,6 @@ class App extends Component {
 						</button> */}
 
 						{recommendations}
-						<Playlists spotifyApi={spotifyApi} onPlaylistSelect={this.onPlaylistSelect} />
           </div>
 				}
 				<footer id="sticky-footer" class="py-4 bg-dark text-white-50">
