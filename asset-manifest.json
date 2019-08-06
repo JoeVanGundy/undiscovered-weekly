@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/undiscovered-weekly/static/css/main.31549b79.chunk.css",
+    "main.js": "/undiscovered-weekly/static/js/main.ec05ce6f.chunk.js",
+    "main.js.map": "/undiscovered-weekly/static/js/main.ec05ce6f.chunk.js.map",
+    "runtime~main.js": "/undiscovered-weekly/static/js/runtime~main.1a0b74c4.js",
+    "runtime~main.js.map": "/undiscovered-weekly/static/js/runtime~main.1a0b74c4.js.map",
+    "static/js/2.95f8bab6.chunk.js": "/undiscovered-weekly/static/js/2.95f8bab6.chunk.js",
+    "static/js/2.95f8bab6.chunk.js.map": "/undiscovered-weekly/static/js/2.95f8bab6.chunk.js.map",
+    "index.html": "/undiscovered-weekly/index.html",
+    "precache-manifest.2732ec42ea43b9e807da068a0c062a1e.js": "/undiscovered-weekly/precache-manifest.2732ec42ea43b9e807da068a0c062a1e.js",
+    "service-worker.js": "/undiscovered-weekly/service-worker.js",
+    "static/css/main.31549b79.chunk.css.map": "/undiscovered-weekly/static/css/main.31549b79.chunk.css.map"
+  }
+}
